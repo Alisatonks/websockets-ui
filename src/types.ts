@@ -60,3 +60,15 @@ export interface ShipsResponse {
   ships: Ships[];
   indexPlayer: number;
 }
+
+export interface PlayerData {
+  id: number | string;
+  ships: Ships[];
+  ready: boolean;
+}
+
+export interface Game {
+  gameId: number | string;
+  players: PlayerData[];
+  currentTurnPlayerId: number | string | null;
+}

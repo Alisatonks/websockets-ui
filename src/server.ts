@@ -1,12 +1,13 @@
 import WebSocket from 'ws';
 import { handleRegistration } from './handlers/registrationHandler';
-import { Room, Player, Commands } from './types';
+import { Room, Player, Commands, Game } from './types';
 import { handleAddUserToRoom, handleCreateRoom } from './handlers/roomHandler';
-import { gameHandler } from './handlers/gameHandler';
+import { handleAddShips } from './handlers/gameHandler';
 
 const createWSServer = () => {
   const playersDB = new Map<string, Player>();
   const roomsDB = new Map<number, Room>();
+  const gamesDB = new Map<number | string, Game>();
   let roomIdCounter = 1;
 
   const wss = new WebSocket.Server({ port: 3000 });
@@ -34,7 +35,7 @@ const createWSServer = () => {
           break;
 
         case Commands.ADD_SHIPS:
-          gameHandler(data.data);
+          handleAddShips(data.data, gamesDB);
           break;
 
         default:
