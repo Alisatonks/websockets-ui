@@ -35,6 +35,9 @@ export enum Commands {
   START_GAME = 'start_game',
   ATTACK = 'attack',
   TURN = 'turn',
+  FINISH = 'finish',
+  WINNERS = 'update_winners',
+  SINGLE_PLAY = 'single_play',
   ERROR = 'error',
   DISCONNECT = 'disconnect',
   RANDOM_ATTACK = 'randomAttack',
@@ -76,7 +79,7 @@ export interface PlayerData {
   id: number | string;
   ships: Ships[];
   ready: boolean;
-  session: WebSocket;
+  session: ExtendedWebSocket;
   shipsCells: ShipCellsArray[];
   attackHistory: Position[];
 }

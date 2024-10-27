@@ -1,4 +1,4 @@
-import { ShipsResponse, Game, ExtendedWebSocket, Commands } from '../types';
+import { ShipsResponse, Game, ExtendedWebSocket, Commands, PlayerData } from '../types';
 import { getShipCells } from '../utils/helpers';
 
 export const sendTurnInfo = (game: Game) => {
@@ -80,4 +80,18 @@ export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>
       console.log(`Waiting for the second player to be ready in game ${gameId}`);
     }
   }
+};
+
+export const finishGame = (id: number | string, players: PlayerData[]) => {
+  players.forEach((player) => {
+    player.session.send(
+      JSON.stringify({
+        type: Commands.FINISH,
+        data: JSON.stringify({
+          winPlayer: id,
+        }),
+        id: 0,
+      }),
+    );
+  });
 };

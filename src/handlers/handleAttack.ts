@@ -1,7 +1,8 @@
 import { Game, Commands, ExtendedWebSocket, ShipCellsArray, Position } from '../types';
 import { GAME_NOT_FOUND, OPPONENT_NOT_FOUND, NOT_PLAYER_TURN } from '../utils/constants';
 import { getSurroundingCells } from '../utils/helpers';
-import { sendTurnInfo } from './gameHandler';
+import { finishGame, sendTurnInfo } from './gameHandler';
+import { updateWinners } from './winnersHandler';
 
 const sendAttackMessage = (game: Game, position: Position, currentPlayer: number | string, status: string) => {
   const player = game.players.find((player) => player.id === currentPlayer);
@@ -74,6 +75,12 @@ const processAttack = (target: Position, opponent: Game['players'][number]) => {
   return { attackResult, killedShip };
 };
 
+const areAllShipsKilled = (opponent: Game['players'][number]) => {
+  return opponent.shipsCells.every((ship) => {
+    return ship.every((cell) => cell.hit === true);
+  });
+};
+
 const handleAttackResult = (
   game: Game,
   target: Position,
@@ -115,13 +122,19 @@ export const handleAttack = (data: string, gamesDB: Map<number | string, Game>, 
   const result = validateGame(game, indexPlayer, ws);
   if (!result) return;
 
-  const { opponent } = result;
+  const { opponent, player } = result;
   const target = { x, y };
 
   const { attackResult, killedShip } = processAttack(target, opponent);
 
   if (game) {
     handleAttackResult(game, target, indexPlayer, attackResult, killedShip, opponent);
+    if (areAllShipsKilled(opponent) && player) {
+      finishGame(indexPlayer, game.players);
+      if (player.session.playerName) {
+        updateWinners(player.session.playerName, game);
+      }
+    }
   }
 };
 
@@ -139,5 +152,11 @@ export const handleRandomAttack = (data: string, gamesDB: Map<number | string, G
 
   if (game) {
     handleAttackResult(game, target, indexPlayer, attackResult, killedShip, opponent);
+    if (areAllShipsKilled(opponent) && player) {
+      finishGame(player?.id, game.players);
+      if (player.session.playerName) {
+        updateWinners(player.session.playerName, game);
+      }
+    }
   }
 };

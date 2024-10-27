@@ -3,6 +3,7 @@ import { Player, Room } from '../types';
 import { INVALID_PASSWORD_ERROR } from '../utils/constants';
 import { ExtendedWebSocket, Commands } from '../types';
 import { updateRoomsList } from '../utils/helpers';
+import { updateWinners } from './winnersHandler';
 
 export const handleRegistration = (
   ws: ExtendedWebSocket,
@@ -34,6 +35,7 @@ export const handleRegistration = (
         }),
       );
       updateRoomsList(wss, roomDB);
+      updateWinners(name, undefined, ws);
     } else {
       console.log('unvalid password');
       ws.send(
@@ -68,6 +70,7 @@ export const handleRegistration = (
       }),
     );
     updateRoomsList(wss, roomDB);
+    updateWinners(name, undefined, ws);
     console.log('respond sended');
   }
   console.log('playersDB', playersDB);
