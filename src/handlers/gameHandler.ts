@@ -58,6 +58,7 @@ export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>
         ready: false,
         session: ws,
         shipsCells: [],
+        attackHistory: [],
       };
       game.players.push(player);
     }

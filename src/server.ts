@@ -3,7 +3,7 @@ import { handleRegistration } from './handlers/registrationHandler';
 import { Room, Player, Commands, Game } from './types';
 import { handleAddUserToRoom, handleCreateRoom } from './handlers/roomHandler';
 import { handleAddShips } from './handlers/gameHandler';
-import { handleAttack } from './handlers/handleAttack';
+import { handleAttack, handleRandomAttack } from './handlers/handleAttack';
 
 const createWSServer = () => {
   const playersDB = new Map<string, Player>();
@@ -41,6 +41,10 @@ const createWSServer = () => {
 
         case Commands.ATTACK:
           handleAttack(data.data, gamesDB, ws);
+          break;
+
+        case Commands.RANDOM_ATTACK:
+          handleRandomAttack(data.data, gamesDB, ws);
           break;
 
         default:

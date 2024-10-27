@@ -37,6 +37,7 @@ export enum Commands {
   TURN = 'turn',
   ERROR = 'error',
   DISCONNECT = 'disconnect',
+  RANDOM_ATTACK = 'randomAttack',
 }
 
 export interface Position {
@@ -77,6 +78,7 @@ export interface PlayerData {
   ready: boolean;
   session: WebSocket;
   shipsCells: ShipCellsArray[];
+  attackHistory: Position[];
 }
 
 export interface Game {
