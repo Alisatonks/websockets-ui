@@ -32,6 +32,9 @@ export enum Commands {
   UPDATE_ROOM = 'update_room',
   CREATE_GAME = 'create_game',
   ADD_SHIPS = 'add_ships',
+  START_GAME = 'start_game',
+  ATTACK = 'attack',
+  TURN = 'turn',
   ERROR = 'error',
   DISCONNECT = 'disconnect',
 }
@@ -60,11 +63,20 @@ export interface ShipsResponse {
   ships: Ships[];
   indexPlayer: number;
 }
+export interface ShipCells {
+  x: number;
+  y: number;
+  hit: boolean;
+}
+
+export type ShipCellsArray = ShipCells[];
 
 export interface PlayerData {
   id: number | string;
   ships: Ships[];
   ready: boolean;
+  session: WebSocket;
+  shipsCells: ShipCellsArray[];
 }
 
 export interface Game {

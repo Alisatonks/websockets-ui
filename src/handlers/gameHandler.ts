@@ -1,6 +1,39 @@
-import { ShipsResponse, Game } from '../types';
+import { ShipsResponse, Game, ExtendedWebSocket, Commands } from '../types';
+import { getShipCells } from '../utils/helpers';
 
-export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>) => {
+export const sendTurnInfo = (game: Game) => {
+  const currentPlayerId = game.currentTurnPlayerId;
+
+  game.players.forEach((player) => {
+    player.session.send(
+      JSON.stringify({
+        type: Commands.TURN,
+        data: JSON.stringify({
+          currentPlayer: currentPlayerId,
+        }),
+        id: 0,
+      }),
+    );
+  });
+};
+
+export const startGame = (game: Game) => {
+  game.players.forEach((player) => {
+    player.session.send(
+      JSON.stringify({
+        type: Commands.START_GAME,
+        data: JSON.stringify({
+          ships: player.ships,
+          currentPlayerIndex: player.id,
+        }),
+        id: 0,
+      }),
+    );
+  });
+  sendTurnInfo(game);
+};
+
+export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>, ws: ExtendedWebSocket) => {
   const shipsObject: ShipsResponse = JSON.parse(data);
   const { gameId } = shipsObject;
   console.log('Adding ships for game ID:', gameId);
@@ -23,11 +56,15 @@ export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>
         id: shipsObject.indexPlayer,
         ships: [],
         ready: false,
+        session: ws,
+        shipsCells: [],
       };
       game.players.push(player);
     }
 
     player.ships = shipsObject.ships;
+    player.shipsCells = player.ships.map((ship) => getShipCells(ship));
+    console.log('player.shipsCells', player.shipsCells);
 
     player.ready = true;
     console.log('gamesDB', gamesDB);
@@ -37,7 +74,7 @@ export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>
 
       console.log(`Game ${gameId} is ready to start!`);
       console.log('gamesDB');
-      //   startGame(game);
+      startGame(game);
     } else {
       console.log(`Waiting for the second player to be ready in game ${gameId}`);
     }
