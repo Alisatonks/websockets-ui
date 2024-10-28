@@ -36,7 +36,6 @@ export const startGame = (game: Game) => {
 export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>, ws: ExtendedWebSocket) => {
   const shipsObject: ShipsResponse = JSON.parse(data);
   const { gameId } = shipsObject;
-  console.log('Adding ships for game ID:', gameId);
 
   if (!gamesDB.has(gameId)) {
     gamesDB.set(gameId, {
@@ -65,16 +64,13 @@ export const handleAddShips = (data: string, gamesDB: Map<number | string, Game>
 
     player.ships = shipsObject.ships;
     player.shipsCells = player.ships.map((ship) => getShipCells(ship));
-    console.log('player.shipsCells', player.shipsCells);
 
     player.ready = true;
-    console.log('gamesDB', gamesDB);
 
     if (game.players.length === 2 && game.players.every((p) => p.ready)) {
       game.currentTurnPlayerId = game.players[0].id;
 
       console.log(`Game ${gameId} is ready to start!`);
-      console.log('gamesDB');
       startGame(game);
     } else {
       console.log(`Waiting for the second player to be ready in game ${gameId}`);

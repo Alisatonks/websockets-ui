@@ -9,19 +9,15 @@ export const handleRegistration = (
   ws: ExtendedWebSocket,
   data: string,
   playersDB: Map<string, Player>,
-  id: number,
   wss: WebSocket.Server,
   roomDB: Map<number, Room>,
 ) => {
   const { name, password } = JSON.parse(data);
 
   if (playersDB.has(name)) {
-    console.log('has a name');
     const player = playersDB.get(name)!;
-    console.log('password/validpassword', password, player.password);
     if (password === player.password) {
       ws.playerName = name;
-      console.log('valid password');
       ws.send(
         JSON.stringify({
           type: Commands.REGISTRATION,
@@ -31,13 +27,12 @@ export const handleRegistration = (
             error: false,
             errorText: '',
           }),
-          id,
+          id: 0,
         }),
       );
       updateRoomsList(wss, roomDB);
       updateWinners(name, undefined, ws);
     } else {
-      console.log('unvalid password');
       ws.send(
         JSON.stringify({
           type: Commands.REGISTRATION,
@@ -47,7 +42,7 @@ export const handleRegistration = (
             error: true,
             errorText: INVALID_PASSWORD_ERROR,
           }),
-          id,
+          id: 0,
         }),
       );
     }
@@ -55,8 +50,6 @@ export const handleRegistration = (
     const newIndex = playersDB.size + 1;
     playersDB.set(name, { password, index: newIndex });
     ws.playerName = name;
-    console.log('create new user');
-    console.log('name', name, '{ password, index: newIndex }', { password, index: newIndex }, 'playerDB', playersDB);
     ws.send(
       JSON.stringify({
         type: Commands.REGISTRATION,
@@ -65,13 +58,11 @@ export const handleRegistration = (
           index: newIndex,
           error: false,
           errorText: '',
-          id,
+          id: 0,
         }),
       }),
     );
     updateRoomsList(wss, roomDB);
     updateWinners(name, undefined, ws);
-    console.log('respond sended');
   }
-  console.log('playersDB', playersDB);
 };

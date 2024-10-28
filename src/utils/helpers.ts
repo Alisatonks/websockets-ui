@@ -13,7 +13,6 @@ export const updateRoomsList = (wss: WebSocket.Server, roomsDB: Map<number, Room
 
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
-      console.log('client updated');
       client.send(
         JSON.stringify({
           type: Commands.UPDATE_ROOM,
@@ -40,7 +39,6 @@ export const getPlayerFromWS = (ws: ExtendedWebSocket, playersDB: Map<string, Pl
 export const getShipCells = (ship: Ships) => {
   const shipCells = [];
   for (let i = 0; i < ship.length; i++) {
-    console.log('ship', ship, 'ship.position', ship.position);
     const position = ship.direction
       ? { x: ship.position.x, y: ship.position.y + i }
       : { x: ship.position.x + i, y: ship.position.y };
@@ -77,3 +75,15 @@ export const getSurroundingCells = (ship: ShipCellsArray) => {
     return { x, y };
   });
 };
+
+export function findRoomByPlayerName(
+  roomsDB: Map<number, Room>,
+  playerName: string,
+): { roomId: number; room: Room } | null {
+  for (const room of roomsDB.values()) {
+    if (room.playersInRoom.some((player) => player.name === playerName)) {
+      return { roomId: room.roomId, room };
+    }
+  }
+  return null;
+}

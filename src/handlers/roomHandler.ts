@@ -11,17 +11,13 @@ export const handleCreateRoom = (
   wss: WebSocket.Server,
 ) => {
   const playerData = getPlayerFromWS(ws, playersDB);
-  console.log('create room function');
 
   if (playerData) {
-    console.log('playerData', playerData);
     const { playerName, player } = playerData;
-    console.log('playerName', 'player', playerName, player);
     if (player) {
       const newRoomId = roomIdCounter++;
 
       roomsDB.set(newRoomId, { roomId: newRoomId, playersInRoom: [{ name: playerName, ...player, session: ws }] });
-      console.log('roomDB', roomsDB);
 
       updateRoomsList(wss, roomsDB);
     } else {
@@ -41,19 +37,14 @@ export const handleAddUserToRoom = (
   playersDB: Map<string, Player>,
   roomsDB: Map<number, Room>,
   wss: WebSocket.Server,
+  singlePlay?: boolean,
 ) => {
   const { indexRoom } = JSON.parse(data);
-  console.log('data handleAddUser', data);
   const playerData = getPlayerFromWS(ws, playersDB);
-
-  console.log('add user to room function');
-
-  console.log('playerData', playerData);
 
   if (playerData) {
     const { playerName, player } = playerData;
-    console.log('player', player, 'roomId', indexRoom, 'roomsDB', roomsDB);
-    if (player && roomsDB.has(indexRoom)) {
+    if ((player && roomsDB.has(indexRoom)) || singlePlay) {
       const room = roomsDB.get(indexRoom);
 
       if (room && room.playersInRoom.length < 2) {
@@ -75,7 +66,6 @@ export const handleAddUserToRoom = (
           roomsDB.delete(indexRoom);
         }
         updateRoomsList(wss, roomsDB);
-        console.log('roomsDB', roomsDB);
         room.playersInRoom.forEach((roomPlayer) => {
           roomPlayer.session.send(
             JSON.stringify({

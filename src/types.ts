@@ -18,6 +18,7 @@ export interface PlayerInRoom {
 
 export interface ExtendedWebSocket extends WebSocket {
   playerName?: string;
+  isAlive?: boolean;
 }
 
 export interface Room {
